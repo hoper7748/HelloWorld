@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace SlimeProject
 {
@@ -25,7 +26,9 @@ namespace SlimeProject
         [HideInInspector]
         public bool Scrolling = false;
         [HideInInspector]
-        public bool Shopping = false;
+        public bool OpenUI = false;
+        [HideInInspector, ReadOnly] // 약 100 미터 마다 강화 
+        public int Level = 0;
 
         public float ScrollSpeed = 0;
         public float resetOffset = 1;
@@ -33,6 +36,8 @@ namespace SlimeProject
         private float resetPositionY = 0;
         [SerializeField, ReadOnly]
         private float startPositionY = 0;
+        [SerializeField, ReadOnly]
+        public bool BossSpawn = false;
 
         int gridSizeX, gridSizeY;
         float nodeDiameter;
@@ -63,8 +68,6 @@ namespace SlimeProject
                 ScrollUpdate();
         }
 
-        
-
         private void ScrollUpdate()
         {
             for(int i = 0; i < ScrollingField.Length; i++)
@@ -78,7 +81,6 @@ namespace SlimeProject
                 }
             }
         }
-
 
         private void OnDrawGizmos()
         {
@@ -104,5 +106,44 @@ namespace SlimeProject
                 }
             }
         }
+
+        public void LevelUp()
+        {
+            Level++;
+        }
+
+        public void StopGame()
+        {
+            Scrolling = false;
+            OpenUI = true;
+        }
+
+        public void StartGame()
+        {
+            Scrolling = true;
+            OpenUI = false;
+        }
+
+        public void Replay()
+        {
+            ManagerReset();
+            
+            SceneManager.LoadScene("Game Scene");
+        }
+
+        public void EndGame()
+        {
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+#endif
+        }
+
+        public void ManagerReset()
+        {
+            Level = 0;
+            Meters = 0;
+            UIManager.Instance.ManagerReset();
+        }
+
     }
 }

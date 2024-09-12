@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5250cd8c8623b18418c88a9a4394be9e, type: 3}
+  m_Name: CryStal Panel
+  m_EditorClassIdentifier: 
+  Sprite: {fileID: -608993307, guid: 6053368ee3598834bb70d23c7963d628, type: 3}
+  type: 5
+  Damage: 0
+  Interval: 0
+  Speed: 0
+  Heal: 0
+  AddCryStal: 5
+  Price: 0
+  Dialogue: "50% \uD655\uB960 \uD06C\uB9AC\uC2A4\uD0C8 5 \uC99D\uAC00"
+  IsRandom: 1

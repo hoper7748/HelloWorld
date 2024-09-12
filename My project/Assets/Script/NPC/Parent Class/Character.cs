@@ -1,3 +1,5 @@
+using Cysharp.Threading.Tasks;
+using System;
 using UnityEngine;
 
 namespace SlimeProject
@@ -12,14 +14,17 @@ namespace SlimeProject
         public Collider2D[] Colliders = new Collider2D[10];
 
         //[Space(10f), Header("Character Info")]
+        [ReadOnly]
+        public float Hp;
 
-        [HideInInspector] public float Hp;
+        public Color MainColor;
+        public Color DamageColor;
 
         [HideInInspector] public float Maxhp;
 
         [HideInInspector] public float Damage;
         [HideInInspector] public float AttackInterval;
-        protected float curAtkTime = 0;
+        protected float curAtkTimer = 0;
         
         protected int CurrentSprite = 0;
 
@@ -34,25 +39,55 @@ namespace SlimeProject
             }
         }
 
-        public virtual void Attack()
+        public virtual void NormalAttack()
         {
-            if(curAtkTime > AttackInterval)
+            if(curAtkTimer > AttackInterval)
             {
                 for (int i = 0; i < Colliders.Length; i++)
                 {
                     Colliders[i].GetComponent<Character>()?.Damaged(Damage);
                 }
-                curAtkTime = 0;
+                curAtkTimer = 0;
             }
         }
+
 
         public virtual void Damaged(float damage)
         {
             Hp -= damage;
             if (Hp <= 0)
             {
-                gameObject.SetActive(false);
+                transform.position = Vector3.down * 10f;
+                if (!(this as Player))
+                {
+                    gameObject.SetActive(false);
+                    return;
+                }
+                else
+                {
+                    FieldManager.Instance.StopGame();
+                    UIManager.Instance.GameOver();
+                    return;
+                }
             }
+            ColorChange().Forget();
+        }
+
+        async UniTaskVoid ColorChange()
+        {
+            MainSprite.material.color = DamageColor;
+            await UniTask.Delay(TimeSpan.FromSeconds(0.25f));
+            MainSprite.material.color = Color.white;
+
+        }
+
+        public virtual void ScrollingCharacter()
+        {
+
+        }
+
+        public virtual void PlayAnim()
+        {
 
         }
     }
