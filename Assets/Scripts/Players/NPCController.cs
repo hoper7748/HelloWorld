@@ -109,7 +109,16 @@ public class NPCController : Entity
                         break;
                 }
             }
-            
+            if (Time.time - lastHitTime >= hpDelayTime)
+            {
+                if (delayedHP > Hp)
+                {
+                    delayedHP -= reduceSpeed * Time.deltaTime;
+                    if (delayedHP < Hp)
+                        delayedHP = Hp;
+                    GameManager.Instance.UpdateHpDelay(delayedHP, PlayerType);
+                }
+            }
         }
     }
 

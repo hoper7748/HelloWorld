@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -56,9 +57,17 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI TimerText;
 
     public Slider P1Hp;
+    public Slider P1HpBack;
     private Vector3 p1HpOrigin;
+    public float delayedP1HP;      // 분홍색 HP (딜레이용)
     public Slider P2Hp;
+    public Slider P2HpBack;
     private Vector3 p2HpOrigin;
+    public float delayedP2HP;      // 분홍색 HP (딜레이용)
+
+    public float delayTime = 1f; // 데미지 누적 후 대기 시간
+    public float reduceSpeed = 30f; // 줄어드는 속도
+    private float lastHitTime;   // 마지막으로 피해를 받은 시간
 
     public List<SpriteRenderer> MyPlace;
     public List<SpriteRenderer> EnemyPlace;
@@ -71,6 +80,7 @@ public class GameManager : MonoBehaviour
     public GameObject EndGamePanel;
     public GameObject WinPanel;
     public GameObject LosePanel;
+
 
     public Color placeColor;
 
@@ -202,10 +212,12 @@ public class GameManager : MonoBehaviour
             if(type == EPlayerType.P1)
             {
                 P1Hp.GetComponent<RectTransform>().localPosition = p1HpOrigin + new Vector3(x, 0f, 0f);
+                P1HpBack.GetComponent<RectTransform>().localPosition = p1HpOrigin + new Vector3(x, 0f, 0f);
             }
             else if(type == EPlayerType.P2)
             {
                 P2Hp.GetComponent<RectTransform>().localPosition = p2HpOrigin + new Vector3(x, 0f, 0f);
+                P2HpBack.GetComponent<RectTransform>().localPosition = p2HpOrigin + new Vector3(x, 0f, 0f);
             }
 
             elapsed += Time.deltaTime;
@@ -224,7 +236,9 @@ public class GameManager : MonoBehaviour
 
     public void GameSet(EPlayerType playerType)
     {
-        // UI 띄우기
+        // 연출 뒤에 UI 띄우기
+        // 1. 사망자 카메라 포커스
+        // 2. 이후 원래 위치로 돌아온 후 패널 띄우기 
         if (playerType == EPlayerType.P1)
         {
             CustomDebug.Log("유저 패배");
@@ -246,5 +260,19 @@ public class GameManager : MonoBehaviour
     public void Restart()
     {
         SceneManager.LoadScene(0);
+    }
+
+    public void UpdateHpDelay(float delayedHP, EPlayerType type)
+    {
+        //redSlider.value = hp / MaxHp;
+        //P1HpBack.value = delayedHP / maxHp;
+        if(type == EPlayerType.P1)
+        {
+            P1HpBack.value = delayedHP;
+        }
+        else if(type == EPlayerType.P2)
+        {
+            P2HpBack.value = delayedHP;
+        }
     }
 }

@@ -35,9 +35,19 @@ public class PlayerController : Entity
             }
             curState.Update();
 
+            if (Time.time - lastHitTime >= hpDelayTime)
+            {
+                if (delayedHP > Hp)
+                {
+                    delayedHP -= reduceSpeed * Time.deltaTime;
+                    if (delayedHP < Hp)
+                        delayedHP = Hp;
+                    GameManager.Instance.UpdateHpDelay(delayedHP, PlayerType);
+                }
+            }
         }
     }
-
+    
     // 특수 상태일 땐 이동할 수 없게 해야함.
     public void MovementStart(int direction)
     {

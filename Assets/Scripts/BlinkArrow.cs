@@ -50,6 +50,8 @@ public class BlinkArrow : MonoBehaviour
 
     private SpriteRenderer warningSign;
 
+    public ParticleSystem particle;
+
     void Start()
     {
         
@@ -85,7 +87,7 @@ public class BlinkArrow : MonoBehaviour
     void Update()
     {
         //if (time < 1)
-        time += Time.deltaTime * 100f;
+        time += Time.deltaTime * 50f;
         wayChangeTime += Time.deltaTime;
 
         if(ArrowType.Summon == arrowType && transform.position.y >= 8f)
@@ -154,10 +156,10 @@ public class BlinkArrow : MonoBehaviour
                     transform.position = target.transform.position + Vector3.up * 6f;
                     transform.rotation = Quaternion.Euler(0, 0, 180f);
                 }
+                time = 0;
                 break;
             case Way.Down:
                 way = Way.Up;
-                CustomDebug.Log("체질변환");
                 transform.rotation = Quaternion.Euler(0, 0, 0);
                 // 예고된 좌표에서 나오게 해야함.
                 // 좌표의 경우 Init으로 설정해주기.
@@ -169,7 +171,9 @@ public class BlinkArrow : MonoBehaviour
                 if (warningSign != null)
                 {
                     transform.position = warningSign.transform.position;
+                    particle.Play();
                 }
+                time = 0;
                 break;
             default:
                 break;
@@ -185,11 +189,13 @@ public class BlinkArrow : MonoBehaviour
                 break;
             case Way.Up:
                 // changeCount 가 1 이상 일 경우 등속운동 아닐 경우 가속
-                transform.Translate((changeCount < 1? Vector3.up * time * Time.deltaTime : Vector3.up * gravity * Time.deltaTime));
+                //transform.Translate((changeCount < 1? Vector3.up * time * Time.deltaTime : Vector3.up * gravity * Time.deltaTime));
+                transform.Translate((changeCount < 1? Vector3.up * time * Time.deltaTime : Vector3.up * time * Time.deltaTime));
                 CustomDebug.Log("올라가는 중");
                 break;
             case Way.Down:
-                transform.Translate((changeCount < 1 ? Vector3.up * time * Time.deltaTime : Vector3.up * gravity * Time.deltaTime));
+                transform.Translate((changeCount < 1 ? Vector3.up * time * Time.deltaTime : Vector3.up * time * Time.deltaTime));
+                //transform.Translate((changeCount < 1 ? Vector3.up * time * Time.deltaTime : Vector3.up * gravity * Time.deltaTime));
                 break;
             default:
                 break;
@@ -207,6 +213,8 @@ public class BlinkArrow : MonoBehaviour
         if (way== Way.Down && collision.gameObject.layer == 6)
         {
             mySprite.enabled = false;
+            particle.Stop();
+            //Destroy(gameObject);
         }
         // Entity계열과 충돌시 피해를 주는 옵션 진행.
     }

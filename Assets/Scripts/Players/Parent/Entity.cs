@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public enum EState
@@ -19,8 +21,9 @@ public enum EPlayerType
 
 public abstract class Entity : MonoBehaviour
 {
-    public int MaxHp = 1400;
-    public int Hp = 1400;
+    public int MaxHp = 100;
+    public float delayedHP = 100;
+    public int Hp = 100;
     public int ATK = 75;
 
     public EPlayerType PlayerType = EPlayerType.P1;
@@ -61,6 +64,9 @@ public abstract class Entity : MonoBehaviour
     public int ScheduledArrow = 0;
     public int rootedTime = 0;
     public GameObject SilentIcon;
+    public float lastHitTime;
+    public float reduceSpeed = 1;
+    public float hpDelayTime = 2;
 
     protected void Awake()
     {
@@ -170,13 +176,41 @@ public abstract class Entity : MonoBehaviour
 
     public void GetDamaged(int damage)
     {
+        if (Time.time - lastHitTime >= hpDelayTime)
+        {
+            if (delayedHP > Hp)
+            {
+                delayedHP = Hp;
+                GameManager.Instance.UpdateHpDelay(delayedHP, PlayerType);
+            }
+        }
         Hp -= damage;
         GameManager.Instance.UpdateHp(this);
-
+        ShowDamageText(damage);
+        lastHitTime = Time.time;
         if (Hp <= 0)
         {
             // 금지
             GameManager.Instance.GameSet(PlayerType);
         }
     }
+
+    public FloatingDamage damageTextPrefab;
+
+    public void ShowDamageText(int damage)
+    {
+        // 텍스트 생성
+        GameObject obj = Instantiate(damageTextPrefab.gameObject, transform);
+        FloatingDamage floatingText = obj.GetComponent<FloatingDamage>();
+        floatingText.SetText(damage);
+
+        // 위치 지정
+        //Vector3 screenPos = Camera.main.WorldToScreenPoint(hitPosition);
+        Vector3 worldPos = transform.position + Vector3.up * .5f + Vector3.right * UnityEngine.Random.Range(-.5f, .5f);
+        obj.transform.position = worldPos;
+
+
+        // 애니메이션은 Animator / DOTween으로 처리
+    }
+
 }
